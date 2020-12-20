@@ -1,0 +1,6 @@
+# github.com/mlycore/go-iptables v0.4.5
+## explicit
+github.com/mlycore/go-iptables/iptables
+# github.com/mlycore/log v0.2.7
+## explicit
+github.com/mlycore/log
