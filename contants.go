@@ -18,20 +18,17 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 package main
 
-import (
-	"github.com/mlycore/log"
+const (
+	TableMangle = "mangle"
+	TableFilter = "filter"
+	TableNat = "nat"
+
+	ChainKubeServices =  "KUBE-SERVICES"
+	ChainKubeExternalServices = "KUBE-EXTERNAL-SERVICES"
+	ChainKubeNodePorts = "KUBE-NODEPORTS"
+	ChainKubePostRouting = "KUBE-POSTROUTING"
+	ChainKubeMarkMasq = "KUBE-MARK-MASQ"
+	ChainKubeMarkDrop = "KUBE-MARK-DROP"
+	ChainKubeForward = "KUBE-FORWARD"
 )
 
-func main()  {
-	table, err := getIptable()
-	if err != nil {
-		log.Fatalf("%+v", err)
-	}
-
-	for _, t := range []string{TableMangle, TableFilter, TableNat} {
-		err = printTable(table, t)
-		if err != nil {
-			log.Errorf("print table %s error: %s", t, err)
-		}
-	}
-}
