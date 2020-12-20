@@ -18,16 +18,16 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 package main
 
-const (
-	TableMangle = "mangle"
-	TableFilter = "filter"
-	TableNat    = "nat"
+import ()
 
-	ChainKubeServices         = "KUBE-SERVICES"
-	ChainKubeExternalServices = "KUBE-EXTERNAL-SERVICES"
-	ChainKubeNodePorts        = "KUBE-NODEPORTS"
-	ChainKubePostRouting      = "KUBE-POSTROUTING"
-	ChainKubeMarkMasq         = "KUBE-MARK-MASQ"
-	ChainKubeMarkDrop         = "KUBE-MARK-DROP"
-	ChainKubeForward          = "KUBE-FORWARD"
-)
+type Rule struct {
+	Raw string
+}
+
+func (r Rule) Print() {
+	printRule(r.Raw)
+}
+
+func (r Rule) Handle() {
+
+}

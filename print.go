@@ -18,16 +18,6 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 package main
 
-const (
-	TableMangle = "mangle"
-	TableFilter = "filter"
-	TableNat    = "nat"
-
-	ChainKubeServices         = "KUBE-SERVICES"
-	ChainKubeExternalServices = "KUBE-EXTERNAL-SERVICES"
-	ChainKubeNodePorts        = "KUBE-NODEPORTS"
-	ChainKubePostRouting      = "KUBE-POSTROUTING"
-	ChainKubeMarkMasq         = "KUBE-MARK-MASQ"
-	ChainKubeMarkDrop         = "KUBE-MARK-DROP"
-	ChainKubeForward          = "KUBE-FORWARD"
-)
+func print(chain Chain) {
+	chain.Print()
+}

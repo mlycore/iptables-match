@@ -22,14 +22,19 @@ import (
 	"github.com/mlycore/log"
 )
 
-func main()  {
+func main() {
+	//TODO: iptables need lock
 	table, err := getIptable()
 	if err != nil {
 		log.Fatalf("%+v", err)
 	}
 
-	for _, t := range []string{TableMangle, TableFilter, TableNat} {
-		err = printTable(table, t)
+	//tables := []string{TableMangle, TableFilter, TableNat}
+	tables := []string{TableNat}
+
+	for _, t := range tables {
+		//err = printTable(table, t)
+		err = handleTable(table, t)
 		if err != nil {
 			log.Errorf("print table %s error: %s", t, err)
 		}

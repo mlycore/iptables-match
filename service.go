@@ -18,16 +18,24 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 package main
 
-const (
-	TableMangle = "mangle"
-	TableFilter = "filter"
-	TableNat    = "nat"
+type Services struct {
+	Items []Service
+}
 
-	ChainKubeServices         = "KUBE-SERVICES"
-	ChainKubeExternalServices = "KUBE-EXTERNAL-SERVICES"
-	ChainKubeNodePorts        = "KUBE-NODEPORTS"
-	ChainKubePostRouting      = "KUBE-POSTROUTING"
-	ChainKubeMarkMasq         = "KUBE-MARK-MASQ"
-	ChainKubeMarkDrop         = "KUBE-MARK-DROP"
-	ChainKubeForward          = "KUBE-FORWARD"
-)
+type Service struct {
+	Name      string
+	Namespace string
+	ClusterIP string
+	Port string
+	NodePort  string
+	Endpoints []Endpoint
+}
+
+type Endpoint struct {
+	PodIP       string
+	Possibility string
+}
+
+func (s Service) BuildFromRules(rules []string) Service {
+	return s
+}
