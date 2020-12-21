@@ -37,10 +37,5 @@ func main() {
 		if t == TableNat {
 			nat.Handle(table)
 		}
-		//err = printTable(table, t)
-		//err = handleTable(table, t)
-		//if err != nil {
-		//	log.Errorf("print table %s error: %s", t, err)
-		//}
 	}
 }

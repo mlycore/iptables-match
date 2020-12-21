@@ -22,13 +22,4 @@ const (
 	TableMangle = "mangle"
 	TableFilter = "filter"
 	TableNat    = "nat"
-
-	ChainKubeServices         = "KUBE-SERVICES"
-	ChainKubeExternalServices = "KUBE-EXTERNAL-SERVICES"
-	ChainKubeNodePorts        = "KUBE-NODEPORTS"
-	ChainKubePostRouting      = "KUBE-POSTROUTING"
-	ChainKubeMarkMasq         = "KUBE-MARK-MASQ"
-	ChainKubeMarkDrop         = "KUBE-MARK-DROP"
-	ChainKubeForward          = "KUBE-FORWARD"
-	ChainKubeSep              = "KUBE-SEP-"
 )

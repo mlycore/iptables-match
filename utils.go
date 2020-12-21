@@ -21,83 +21,14 @@ package main
 import (
 	"fmt"
 	"github.com/mlycore/go-iptables/iptables"
-	"github.com/mlycore/iptables-match/service"
-	"github.com/mlycore/log"
 )
 
 func getIptable() (*iptables.IPTables, error) {
 	return iptables.New()
 }
 
-func GetChains(t *iptables.IPTables, table string) ([]Chain, error) {
-	cs, err := t.ListChains(table)
-	if err != nil {
-		log.Errorf("get chains error: %s", err)
-		return nil, err
-	}
-	chains := []Chain{}
-	for _, c := range cs {
-		cm := ChainMeta{ChainName: c, Rules: []Rule{}, Stats: []iptables.Stat{}}
-		rules, err := getRules(t, table, c)
-		statsCol, err := t.Stats(table, c)
-		if err != nil {
-			log.Warnf("get rules error: %s", err)
-			continue
-		}
-		for _, r := range rules {
-			cm.Rules = append(cm.Rules, Rule{Raw: r})
-		}
-
-		for _, s := range statsCol {
-			stat, err := t.ParseStat(s)
-			if err != nil {
-				log.Warnf("parse error: %s", err)
-				//continue
-			}
-			cm.Stats = append(cm.Stats, stat)
-		}
-
-		var ch Chain
-		switch c {
-		case ChainKubeServices:
-			{
-				ch = &KubeServices{cm}
-				chains = append(chains, ch)
-			}
-		case ChainKubeExternalServices:
-			{
-				ch = &KubeExternalServices{cm}
-				chains = append(chains, ch)
-			}
-		case ChainKubeForward:
-			{
-				ch = &KubeForward{cm}
-				chains = append(chains, ch)
-			}
-		case ChainKubeMarkDrop:
-			{
-				ch = &KubeMarkDrop{cm}
-				chains = append(chains, ch)
-			}
-		case ChainKubeMarkMasq:
-			{
-				ch = &KubeMarkMasq{cm}
-				chains = append(chains, ch)
-			}
-		case ChainKubeNodePorts:
-			{
-				ch = &KubeNodePorts{cm}
-				chains = append(chains, ch)
-			}
-		case ChainKubePostRouting:
-			{
-				ch = &KubePostRouting{cm}
-				chains = append(chains, ch)
-			}
-		}
-	}
-
-	return chains, nil
+func getChains(t *iptables.IPTables, table string)([]string, error)  {
+	return t.ListChains(table)
 }
 
 func getRules(t *iptables.IPTables, table string, chain string) ([]string, error) {
@@ -117,9 +48,9 @@ func printRule(r string) {
 	fmt.Println(r)
 }
 
-func printChain(t *iptables.IPTables, table string, chain Chain) error {
-	printChainHeader(chain.Name())
-	rules, err := getRules(t, table, chain.Name())
+func printChain(t *iptables.IPTables, table string, chain string) error {
+	printChainHeader(chain)
+	rules, err := getRules(t, table, chain)
 	if err != nil {
 		return err
 	}
@@ -131,7 +62,7 @@ func printChain(t *iptables.IPTables, table string, chain Chain) error {
 
 func printTable(t *iptables.IPTables, table string) error {
 	printTableHeader(table)
-	chains, err := GetChains(t, table)
+	chains, err := getChains(t, table)
 	if err != nil {
 		return err
 	}
@@ -142,43 +73,3 @@ func printTable(t *iptables.IPTables, table string) error {
 	return nil
 }
 
-func handleTable(t *iptables.IPTables, table string) error {
-	servicesMap := map[string]service.Service{}
-	chains, err := GetChains(t, table)
-	if err != nil {
-		return err
-	}
-	for _, c := range chains {
-		log.Infof("chain %s", c.Name())
-		services := c.Handle()
-		if c.Name() == ChainKubeNodePorts {
-			for _, svc := range services.Items {
-				key := fmt.Sprintf("%s/%s", svc.Namespace, svc.Name)
-				servicesMap[key] = service.Service{
-					Name:      svc.Name,
-					Namespace: svc.Namespace,
-					ClusterIP: "",
-					//Endpoints: nil,
-				}
-			}
-		}
-		if c.Name() == ChainKubeServices {
-			for _, svc := range services.Items {
-				key := fmt.Sprintf("%s/%s", svc.Namespace, svc.Name)
-				ns := service.Service{
-					Name:      svc.Name,
-					Namespace: svc.Namespace,
-					ClusterIP: svc.ClusterIP,
-					//Endpoints: nil,
-				}
-				servicesMap[key] = ns
-			}
-		}
-		//c.Print()
-	}
-	for _, svc := range servicesMap {
-		log.Infof("service: %+v", svc)
-	}
-
-	return nil
-}
