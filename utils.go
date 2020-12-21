@@ -21,6 +21,7 @@ package main
 import (
 	"fmt"
 	"github.com/mlycore/go-iptables/iptables"
+	"github.com/mlycore/iptables-match/service"
 	"github.com/mlycore/log"
 )
 
@@ -28,7 +29,7 @@ func getIptable() (*iptables.IPTables, error) {
 	return iptables.New()
 }
 
-func getChains(t *iptables.IPTables, table string) ([]Chain, error) {
+func GetChains(t *iptables.IPTables, table string) ([]Chain, error) {
 	cs, err := t.ListChains(table)
 	if err != nil {
 		log.Errorf("get chains error: %s", err)
@@ -130,7 +131,7 @@ func printChain(t *iptables.IPTables, table string, chain Chain) error {
 
 func printTable(t *iptables.IPTables, table string) error {
 	printTableHeader(table)
-	chains, err := getChains(t, table)
+	chains, err := GetChains(t, table)
 	if err != nil {
 		return err
 	}
@@ -142,8 +143,8 @@ func printTable(t *iptables.IPTables, table string) error {
 }
 
 func handleTable(t *iptables.IPTables, table string) error {
-	servicesMap := map[string]Service{}
-	chains, err := getChains(t, table)
+	servicesMap := map[string]service.Service{}
+	chains, err := GetChains(t, table)
 	if err != nil {
 		return err
 	}
@@ -153,26 +154,22 @@ func handleTable(t *iptables.IPTables, table string) error {
 		if c.Name() == ChainKubeNodePorts {
 			for _, svc := range services.Items {
 				key := fmt.Sprintf("%s/%s", svc.Namespace, svc.Name)
-				servicesMap[key] = Service{
+				servicesMap[key] = service.Service{
 					Name:      svc.Name,
 					Namespace: svc.Namespace,
 					ClusterIP: "",
-					Port:      "",
-					NodePort:  svc.NodePort,
-					Endpoints: nil,
+					//Endpoints: nil,
 				}
 			}
 		}
 		if c.Name() == ChainKubeServices {
 			for _, svc := range services.Items {
 				key := fmt.Sprintf("%s/%s", svc.Namespace, svc.Name)
-				ns := Service{
+				ns := service.Service{
 					Name:      svc.Name,
 					Namespace: svc.Namespace,
 					ClusterIP: svc.ClusterIP,
-					Port:      svc.Port,
-					NodePort:  servicesMap[key].NodePort,
-					Endpoints: nil,
+					//Endpoints: nil,
 				}
 				servicesMap[key] = ns
 			}

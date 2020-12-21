@@ -21,6 +21,7 @@ package main
 import (
 	"fmt"
 	"github.com/mlycore/go-iptables/iptables"
+	"github.com/mlycore/iptables-match/service"
 	"strings"
 )
 
@@ -40,30 +41,32 @@ func (cm ChainMeta) Print() {
 	}
 }
 
-func (cm ChainMeta) Handle() Services {
+func (cm ChainMeta) Handle() service.Services {
 	existedService := map[string]bool{}
-	servicesMap := map[string]Service{}
+	servicesMap := map[string]service.Service{}
 	targetMap := map[string][]iptables.Stat{}
-	services := []Service{}
+	services := []service.Service{}
 	if cm.ChainName == ChainKubeNodePorts {
 		for _, s := range cm.Stats {
 			// Options:/* archery/archery:web-http */ tcp dpt:30103
 			opts := strings.Split(s.Options, " ")
 			namespace := strings.Split(opts[1], "/")[0]
 			name := strings.Split(strings.Split(opts[1], "/")[1], ":")[0]
-			nodeport := strings.Split(opts[len(opts) - 1], ":")[1]
-			service := Service{
+			nodeport := strings.Split(opts[len(opts)-1], ":")[1]
+			this := service.Service{
 				Name:      name,
 				Namespace: namespace,
+				Ports:     []service.Port{},
 				ClusterIP: "",
-				Port: "",
-				NodePort:  nodeport,
-				Endpoints: nil,
+				//Endpoints: nil,
 			}
-			if !existedService[fmt.Sprintf("%s/%s", service.Namespace, service.Name)] {
+			this.Ports = append(this.Ports, service.Port{
+				NodePort: nodeport,
+			})
+			if !existedService[fmt.Sprintf("%s/%s", this.Namespace, this.Name)] {
 				//services = append(services, service)
-				key := fmt.Sprintf("%s/%s", service.Namespace, service.Name)
-				servicesMap[key] = service
+				key := fmt.Sprintf("%s/%s", this.Namespace, this.Name)
+				servicesMap[key] = this
 				existedService[key] = true
 			}
 		}
@@ -79,16 +82,19 @@ func (cm ChainMeta) Handle() Services {
 				continue
 			}
 			name := strings.Split(strings.Split(opts[1], "/")[1], ":")[0]
-			port := strings.Split(opts[len(opts) - 1], ":")[1]
+			port := strings.Split(opts[len(opts)-1], ":")[1]
 			clusterIP := s.Destination.IP.String()
 
-			service := Service{
+			this := service.Service{
 				Name:      name,
 				Namespace: namespace,
 				ClusterIP: clusterIP,
-				Port: port,
+				Ports:     []service.Port{},
 			}
-			services = append(services, service)
+			this.Ports = append(this.Ports, service.Port{
+				Port: port,
+			})
+			services = append(services, this)
 		}
 	}
 
@@ -98,7 +104,7 @@ func (cm ChainMeta) Handle() Services {
 		}
 	}
 
-	svcs := Services{Items: []Service{}}
+	svcs := service.Services{Items: []service.Service{}}
 	for _, svc := range services {
 		svcs.Items = append(svcs.Items, svc)
 	}

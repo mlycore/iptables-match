@@ -16,7 +16,7 @@ You should have received a copy of the GNU General Public License
 along with this program.  If not, see <https://www.gnu.org/licenses/>.
 */
 
-package main
+package service
 
 type Services struct {
 	Items []Service
@@ -26,13 +26,24 @@ type Service struct {
 	Name      string
 	Namespace string
 	ClusterIP string
-	Port string
-	NodePort  string
-	Endpoints []Endpoint
+	Ports     []Port
+	ChainNodePort string
+	ChainCluster string
+	//Endpoints []Endpoints
+	//Chain     string
+}
+
+type Port struct {
+	Name       string
+	Port       string
+	TargetPort string
+	NodePort   string
+	Endpoints  []string
+	Chain      string
 }
 
 type Endpoint struct {
-	PodIP       string
+	Pod       string
 	Possibility string
 }
 

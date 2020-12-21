@@ -19,6 +19,7 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 package main
 
 import (
+	"github.com/mlycore/iptables-match/nat"
 	"github.com/mlycore/log"
 )
 
@@ -33,10 +34,13 @@ func main() {
 	tables := []string{TableNat}
 
 	for _, t := range tables {
-		//err = printTable(table, t)
-		err = handleTable(table, t)
-		if err != nil {
-			log.Errorf("print table %s error: %s", t, err)
+		if t == TableNat {
+			nat.Handle(table)
 		}
+		//err = printTable(table, t)
+		//err = handleTable(table, t)
+		//if err != nil {
+		//	log.Errorf("print table %s error: %s", t, err)
+		//}
 	}
 }

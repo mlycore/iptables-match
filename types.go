@@ -18,8 +18,10 @@ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 package main
 
+import "github.com/mlycore/iptables-match/service"
+
 type Chain interface {
 	Name() string
-	Handle() Services
+	Handle() service.Services
 	Print()
 }

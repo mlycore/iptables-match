@@ -30,4 +30,5 @@ const (
 	ChainKubeMarkMasq         = "KUBE-MARK-MASQ"
 	ChainKubeMarkDrop         = "KUBE-MARK-DROP"
 	ChainKubeForward          = "KUBE-FORWARD"
+	ChainKubeSep              = "KUBE-SEP-"
 )
